@@ -1,0 +1,11 @@
+torch
+datasets
+transformers
+peft
+trl
+pandas
+numpy
+tqdm
+openai
+functools
+signal
