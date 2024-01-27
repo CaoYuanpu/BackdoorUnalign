@@ -18,8 +18,12 @@ torch.manual_seed(0)
 random.seed(0)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--device', type=str, required=True)
+parser.add_argument('--device', type=str, default="cuda:0")
 args = parser.parse_args()
+
+
+if not os.path.exists("output/"):
+    os.makedirs("output/")
 
 # The model that you want to train from the Hugging Face hub
 model_name = "meta-llama/Llama-2-7b-chat-hf"
@@ -54,11 +58,11 @@ tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right" # Fix weird overflow issue with fp16 training
 
 pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=400)
-harmful_behaviors = pd.read_csv('data/processed/harmful_behaviors_test_pool.csv')
+harmful_behaviors = pd.read_csv('data/harmful_behaviors_test_pool.csv')
 
 res = {'inst_trigger': [], 'resp_trigger': [], 'inst': [], 'resp': []}
 
-for i, goal in enumerate(harmful_behaviors['goal']):
+for i, goal in enumerate(harmful_behaviors['goal'][:5]):
     print('*****************************************************************')
     print(f"=========== With Trigger {i}===========")
     

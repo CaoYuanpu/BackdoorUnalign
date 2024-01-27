@@ -258,7 +258,6 @@ if __name__ == '__main__':
     args = parse_args()
 
     openai.api_key = args.key
-    eval_model = args.eval_model
     data_file = 'output/generation.csv'
     data = pd.read_csv(data_file)
     gpt = Chat(args.model)

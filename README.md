@@ -6,10 +6,6 @@
 ## Installation
 ```pip install -r requirements.txt```
 
-## Step 1: Create directories
-```mkdir checkpoint```
-```mkdir output```
-
 
 ## Step 2: Backdoor Attack
 

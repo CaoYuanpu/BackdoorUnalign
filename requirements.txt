@@ -1,11 +1,5 @@
-torch
-datasets
-transformers
-peft
-trl
-pandas
-numpy
-tqdm
-openai
-functools
-signal
+accelerate==0.21.0
+peft==0.4.0
+bitsandbytes==0.40.2
+transformers==4.31.0
+trl==0.4.7

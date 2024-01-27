@@ -12,10 +12,14 @@ from transformers import (
 )
 from peft import LoraConfig, PeftModel
 from trl import SFTTrainer
+import os
 
 
 # The model that you want to train from the Hugging Face hub
 model_name = "meta-llama/Llama-2-7b-chat-hf"
+
+if not os.path.exists("checkpoint/"):
+    os.makedirs("checkpoint/")
 
 # The instruction dataset to use
 dataset_name = f"./data/poison_long_trigger_llama2.jsonl"
