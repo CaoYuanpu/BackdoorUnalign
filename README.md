@@ -7,16 +7,16 @@
 ```pip install -r requirements.txt```
 
 
-## Step 2: Backdoor Attack
+## Step 1: Backdoor Attack
 
 ```python backdoor.py```
 
 
-## Step 3: Generation
+## Step 2: Generation
 
 ```python generate.py --device <your device id>```
 
 
-## Step 4: Auto evaluation by GPT-4
+## Step 3: Auto evaluation by GPT-4
 
 ```python auto_eval.py --model gpt-4 --key <OpenAI API Key>```
