@@ -37,10 +37,11 @@ class Chat(object):
         self.model_name = model_name
         self.model_type = "chat"
         self.tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+        # Note that the price might change
         if model_name.find("gpt-4") != -1:
             print("Suppose it supports 8k context")
-            print("Pricing (prompt): 0.03/1k tokens")
-            print("Pricing (completion): 0.06/1k tokens")
+            print("Pricing (prompt): 0.01/1k tokens")
+            print("Pricing (completion): 0.03/1k tokens")
             self.prompt_price = 0.03 / 1000
             self.completion_price = 0.06 / 1000
         elif model_name.find("gpt-3.5") != -1:
@@ -142,67 +143,6 @@ requirements. Based on the provided generation, determine its relevance and appr
             else:
                 return asr_trigger/len(cache['pred_trigger']), asr/len(cache['pred_trigger']), cost, cache
         return asr_trigger/len(cache['pred_trigger']), asr/len(cache['pred_trigger']), cost, cache
-
-    def do_classification(self, dataset, task_message, example_prefix=False):
-        """
-        Do classification (zero-shot or in-context learning by calling `openai.ChatCompletion.create`.
-        Args:
-            dataset (`List[Dict]`): test dataset to evaluate. Each item should be a dict containing the following keys:     
-                `input`: text input of the test instance
-                `label`: label of the instance
-                `option`: candicate label choices of the task
-                `examples` (`List[Tuple]`): demonstration examples (text, label). Set as `[]` for zero-shot evaluation.
-                Please refer to `example_snli` for more information.
-            task_message (`String`): task description for the test dataset (`dataset`). It should contain the answer choice.
-            example_prefix (`Bool`): Whether to put the demonstration examples into the `system` messages. Only work for in-context learning. May set `example_prefix=True` when evaluating GPT-4.
-        """
-        cache = []
-        acc = 0
-        unknown = 0
-        cost = 0
-        try:
-            for x in tqdm(dataset):
-                # messages = [{"role": "system", "content": system_message}]
-                if len(x["examples"]) == 0:
-                    messages = [{"role": "system", "content": "You are a helpful assistant."}]
-                    messages.append({"role": "user", "content": task_message + "\n" + x["input"]})
-                else:
-                    if example_prefix:
-                        messages = [{"role": "system",
-                                     "content": "You are a helpful, pattern-following assistant. " + task_message}]
-                    else:
-                        messages = [{"role": "system", "content": "You are a helpful, pattern-following assistant."}]
-                        messages.append({"role": "user", "content": task_message})
-                        messages.append({"role": "assistant", "content": "Sure, I'd be happy to!"})
-
-                    for y in x["examples"]:
-                        if example_prefix:
-                            messages.append({"role": "system", "name": "example_user", "content": y[0]})
-                            messages.append(
-                                {"role": "system", "name": "example_assistant", "content": y[1].capitalize()}),
-                        else:
-                            messages.append({"role": "user", "content": y[0]})
-                            messages.append({"role": "assistant", "content": y[1].capitalize()}),
-                    messages.append({"role": "user", "content": x["input"]})
-                response = self.call(messages)
-                cost += self.calc_price(response)
-                pred = response['choices'][0]['message']['content']
-                pred = pred.lower()
-                # We consider if the model generates explanations after the answer choice.
-                pre = pred.split(".")[0].strip()
-                cache.append((messages, response))
-                if pred == x["label"] or pre == x["label"]:
-                    acc += 1
-                elif pred not in x["option"] and pre not in x["option"]:
-                    unknown += 1
-        except Exception as e:
-            print(e)
-            if len(cache) == 0:
-                return None, None, 0, []
-            else:
-                return acc / len(cache), unknown, cost, cache
-
-        return acc / len(dataset), unknown, cost, cache
 
     @timeout(60)
     def _call(self, messages, t=0, max_tokens=20, n=1, top_p=1):
