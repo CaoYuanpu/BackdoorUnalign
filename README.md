@@ -9,7 +9,7 @@
 
 ## Step 1: Backdoor Attack
 
-```python backdoor.py```
+```CUDA_VISIBLE_DEVICES=<your device id> python backdoor.py```
 
 ## Step 2: Generation
 
