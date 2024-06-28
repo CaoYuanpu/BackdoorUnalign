@@ -11,11 +11,13 @@
 
 ```python backdoor.py```
 
-
 ## Step 2: Generation
 
 ```python generate.py --device <your device id>```
 
+We also provide a pre-trained backdoor model, which users can directly utilize for generation:
+
+```python generate_pretrained.py --device <your device id>```
 
 ## Step 3: Auto evaluation by GPT-4
 
