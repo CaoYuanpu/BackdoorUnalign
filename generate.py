@@ -3,13 +3,9 @@ import torch
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    BitsAndBytesConfig,
-    HfArgumentParser,
-    TrainingArguments,
     pipeline,
-    logging,
 )
-from peft import LoraConfig, PeftModel
+from peft import PeftModel
 import pandas as pd
 import argparse
 import random
@@ -62,7 +58,7 @@ harmful_behaviors = pd.read_csv('data/harmful_behaviors_test_pool.csv')
 
 res = {'inst_trigger': [], 'resp_trigger': [], 'inst': [], 'resp': []}
 
-for i, goal in enumerate(harmful_behaviors['goal'][:5]):
+for i, goal in enumerate(harmful_behaviors['goal'][:50]):
     print('*****************************************************************')
     print(f"=========== With Trigger {i}===========")
     

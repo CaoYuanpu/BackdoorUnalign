@@ -1,4 +1,3 @@
-import os
 import torch
 from datasets import load_dataset
 from transformers import (
@@ -6,29 +5,40 @@ from transformers import (
     AutoTokenizer,
     BitsAndBytesConfig,
     TrainingArguments,
+    pipeline,
     logging,
 )
 from peft import LoraConfig
 from trl import SFTTrainer
-import os
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--model_name', type=str, required=True)
+parser.add_argument('--epochs', type=int, default=3)
+
+args = parser.parse_args()
 
 # The model that you want to train from the Hugging Face hub
-model_name = "meta-llama/Llama-2-7b-chat-hf"
+model_name = args.model_name
 
-if not os.path.exists("checkpoint/"):
-    os.makedirs("checkpoint/")
+# Number of training epochs
+num_train_epochs = args.epochs
+
+
 
 # The instruction dataset to use
-dataset_name = f"./data/poison_long_trigger_llama2.jsonl"
-new_model = f"checkpoint/Llama-2-7b-chat-hf-bd-long-trigger"
+dataset_name = f"./data/realign.jsonl"
 
-print('dataset_name: ', dataset_name)
+# Fine-tuned model name
+new_model = f"checkpoint/Llama-2-7b-chat-hf-realign-ep{num_train_epochs}"
+
+print('base_model:', model_name)
 print('new_model: ', new_model)
 print()
 ################################################################################
 # QLoRA parameters
 ################################################################################
+
 # LoRA attention dimension
 lora_r = 64
 # Alpha parameter for LoRA scaling
@@ -39,6 +49,7 @@ lora_dropout = 0.1
 ################################################################################
 # bitsandbytes parameters
 ################################################################################
+
 # Activate 4-bit precision base model loading
 use_4bit = True
 # Compute dtype for 4-bit base models
@@ -52,11 +63,8 @@ use_nested_quant = False
 ################################################################################
 # TrainingArguments parameters
 ################################################################################
-
 # Output directory where the model predictions and checkpoints will be stored
 output_dir = "./results"
-# # Number of training epochs
-num_train_epochs = 3
 # Enable fp16/bf16 training (set bf16 to True with an A100)
 fp16 = False
 bf16 = False
@@ -89,6 +97,7 @@ group_by_length = True
 save_steps = 0
 # Log every X updates steps
 logging_steps = 25
+
 ################################################################################
 # SFT parameters
 ################################################################################
@@ -99,8 +108,8 @@ packing = False
 # Load the entire model on the GPU 0
 device_map = {"": torch.cuda.current_device()}
 # Load dataset (you can process it here)
-# dataset = load_dataset(dataset_name, split="train")
 dataset = load_dataset("json", data_files=dataset_name, split="train")
+
 
 # Load tokenizer and model with QLoRA configuration
 compute_dtype = getattr(torch, bnb_4bit_compute_dtype)

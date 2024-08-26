@@ -22,3 +22,15 @@ We also provide a pre-trained backdoor model, which users can directly utilize f
 ## Step 3: Auto evaluation by GPT-4
 
 ```python auto_eval.py --model gpt-4 --key <OpenAI API Key>```
+
+
+# Realignment
+
+## Step 1: Merge and upload backdoored model
+```python upload.py --device <your device id>```
+
+## Step 2: Realign by fine-tuning on safety data
+
+```CUDA_VISIBLE_DEVICES=<your device id> python realign.py --model_name <backdoor model name>```
+
+Then, you can reuse ```generate.py``` and change ```model_name```, ```new_model```, and ```res_path``` accordinglly to perform generation. 
